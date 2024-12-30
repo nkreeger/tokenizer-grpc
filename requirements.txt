@@ -3,6 +3,7 @@ anyio==4.7.0
 certifi==2024.12.14
 charset-normalizer==3.4.1
 click==8.1.8
+distro==1.9.0
 dnspython==2.7.0
 email_validator==2.2.0
 exceptiongroup==1.2.2
@@ -19,10 +20,12 @@ httpx==0.28.1
 huggingface-hub==0.27.0
 idna==3.10
 Jinja2==3.1.5
+jiter==0.8.2
 markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
 numpy==2.2.1
+openai==1.58.1
 packaging==24.2
 protobuf==5.29.2
 pydantic==2.10.4
