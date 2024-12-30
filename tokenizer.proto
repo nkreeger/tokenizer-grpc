@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package tokenizer;
+
+// The greeting service definition.
+service Tokenizer {
+  // Sends a greeting
+  rpc SendTokens (TokenRequest) returns (TokenRequestReply) {}
+}
+
+// The request message containing the user's name.
+message TokenRequest {
+  string name = 1;
+  repeated string tokens = 2;
+  // Something about context here?
+}
+
+// The response message containing the greetings
+message TokenRequestReply {
+  string message = 1;
+}
