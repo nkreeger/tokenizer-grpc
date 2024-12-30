@@ -6,36 +6,12 @@
 
 #include "tokenizer.grpc.pb.h"
 
-// class GreeterServiceImpl final : public Greeter::Service {
-//   Status SayHello(ServerContext* context, const HelloRequest* request,
-//                   HelloReply* reply) override {
-//     std::string prefix("Hello ");
-//     reply->set_message(prefix + request->name());
-
-//     std::cerr << "Received SayHello request: " << std::endl;
-//     std::cerr << request->DebugString() << std::endl;
-
-//     return Status::OK;
-//   }
-
-//   Status SayHelloAgain(ServerContext* context, const HelloRequest* request,
-//       HelloReply* reply) override {
-//     std::string prefix("Hello again: ");
-//     reply->set_message(prefix + request->name());
-//     return Status::OK;
-//   }
-// };
-
-using grpc::Server;
-using grpc::ServerBuilder;
-using grpc::ServerContext;
-using grpc::Status;
 
 //------------------------------------------------------------------------------
 // TokenizerServiceImpl
 
 class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
-  Status SendTokens(ServerContext* context,
+  grpc::Status SendTokens(grpc::ServerContext* context,
                     const ::tokenizer::TokenRequest* request,
                     ::tokenizer::TokenRequestReply* response) {
     std::cerr << "Hi from SendTokens()" << std::endl;
@@ -44,7 +20,7 @@ class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
       std::cerr << request->tokens(i) << std::endl;
     }
 
-    return Status::OK;
+    return grpc::Status::OK;
   }
 };
 
@@ -54,14 +30,14 @@ int main(int argc, char** argv) {
   TokenizerServiceImpl service;
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
-  ServerBuilder builder;
+  grpc::ServerBuilder builder;
   // Listen on the given address without any authentication mechanism.
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
   // Register "service" as the instance through which we'll communicate with
   // clients. In this case it corresponds to an *synchronous* service.
   builder.RegisterService(&service);
   // Finally assemble the server.
-  std::unique_ptr<Server> server(builder.BuildAndStart());
+  std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
   std::cout << "Server listening on " << server_address << std::endl;
 
   // Wait for the server to shutdown. Note that some other thread must be
