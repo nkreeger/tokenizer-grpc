@@ -39,6 +39,11 @@ class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
                     const ::tokenizer::TokenRequest* request,
                     ::tokenizer::TokenRequestReply* response) {
     std::cerr << "Hi from SendTokens()" << std::endl;
+
+    for (int i = 0; i < request->tokens_size(); i++) {
+      std::cerr << request->tokens(i) << std::endl;
+    }
+
     return Status::OK;
   }
 };
