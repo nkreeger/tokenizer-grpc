@@ -1,6 +1,12 @@
 from fastapi import FastAPI, Request
+from transformers import AutoTokenizer
+
+import grpc
+import tokenizer_pb2
+import tokenizer_pb2_grpc
 
 app = FastAPI()
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
 
 
 @app.post("/chat/completions")
@@ -8,16 +14,24 @@ async def post_chat_completions(request: Request):
 
     try:
         request_json = await request.json()
-        print(request_json)
 
-        #
-        #
-        # TODO(kreeger): LEFT OFF RIGHT HERE.
-        # -- Need to build a context from this OpenAI client request.
-        # -- That context can then be fed to the RPC server with tokens
-        #    and maybe some batching stuff.
-        #
-        #
+        # Testing only, just one item
+        message = request_json['messages'][0]
+
+        # TODO(kreeger): I don't think this is the proper way to format a prompt, but
+        # it will work for this demo.
+        prompt = "ROLE: {}\nMESSAGE: {}".format(message['role'], message['content'])
+        tokens = tokenizer.tokenize(prompt)
+
+        with grpc.insecure_channel("localhost:50051") as channel:
+            stub = tokenizer_pb2_grpc.TokenizerStub(channel)
+
+            request = tokenizer_pb2.TokenRequest()
+            for token in tokens: 
+                request.tokens.append(token)
+
+            response = stub.SendTokens(request)
+            print("Tokenizer client received: " + response.message)
 
     except Exception as e:
         print(e)
