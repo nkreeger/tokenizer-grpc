@@ -14,6 +14,8 @@ message(STATUS "Using protobuf ${Protobuf_VERSION}")
 find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 
+find_package(CUDA REQUIRED)
+
 get_filename_component(tokenizer_proto "tokenizer.proto" ABSOLUTE)
 get_filename_component(tokenizer_proto_path "${tokenizer_proto}" PATH)
 
@@ -55,3 +57,11 @@ target_link_libraries(tokenizer_server
     gRPC::grpc++_reflection
     protobuf::libprotobuf
 )
+
+cuda_add_executable(cuda_test cuda_test.cc)
+target_link_libraries(cuda_test ${CUDA_LIBRARIES})
+# target_include_directories(cuda_test PUBLIC /usr/local/cuda/include)
+# target_link_libraries(cuda_test
+#     ${CUDA_LIBRARIES}
+#     ${CUDA_cudart_static_LIBRARY}
+# )
