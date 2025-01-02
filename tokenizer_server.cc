@@ -6,7 +6,43 @@
 
 #include "tokenizer.grpc.pb.h"
 
-#include "cuda_utils.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+//------------------------------------------------------------------------------
+// Stub CUDA Session class.
+
+//
+//
+// TODO(kreeger): LEFT OFF RIGHT HERE - MOVE THIS TO A SEPERATE LIBRARY AND LINK.
+// GETTING THE nvcc COMPILER THROUGH absl ISN'T GOOD!
+//
+//
+
+#define ENSURE_SUCCESS(result, msg) \
+  if (result != CUDA_SUCCESS) { std::cerr << msg << std::endl; }
+
+class CudaSession {
+ public:
+  CudaSession() {}
+
+  void allocateStubMemory() {
+    CUresult result;
+
+    // Allocate 10MB for fun:
+    size_t bytes = 1024 * 1025 * 10;
+
+    CUdeviceptr deviceptr;
+    result = cuMemAlloc(&deviceptr, bytes);
+    ENSURE_SUCCESS(result, "Could not allocate device memory");
+
+    result = cuMemFree(deviceptr);
+    ENSURE_SUCCESS(result, "Could not free device memory");
+  }
+
+  virtual ~CudaSession() {}
+};
+
 
 //------------------------------------------------------------------------------
 // TokenizerServiceImpl
@@ -24,9 +60,19 @@ class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
     return grpc::Status::OK;
   }
 
-public:
+  CudaSession* session;
+
+ public:
   void initCuda() {
     // Stub to just make sure a CUDA device is setup.
+    session = new CudaSession();
+    session->allocateStubMemory();
+  }
+
+  virtual ~TokenizerServiceImpl() {
+    if (session) {
+      delete session;
+    }
   }
 };
 
