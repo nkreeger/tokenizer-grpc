@@ -16,18 +16,18 @@ async def post_chat_completions(request: Request):
         request_json = await request.json()
 
         # Testing only, just one item
-        message = request_json['messages'][0]
+        message = request_json["messages"][0]
 
         # TODO(kreeger): I don't think this is the proper way to format a prompt, but
         # it will work for this demo.
-        prompt = "ROLE: {}\nMESSAGE: {}".format(message['role'], message['content'])
+        prompt = "ROLE: {}\nMESSAGE: {}".format(message["role"], message["content"])
         tokens = tokenizer.tokenize(prompt)
 
         with grpc.insecure_channel("localhost:50051") as channel:
             stub = tokenizer_pb2_grpc.TokenizerStub(channel)
 
             request = tokenizer_pb2.TokenRequest()
-            for token in tokens: 
+            for token in tokens:
                 request.tokens.append(token)
 
             response = stub.SendTokens(request)
@@ -35,7 +35,6 @@ async def post_chat_completions(request: Request):
 
     except Exception as e:
         print(e)
-
 
     # Mock OpenAI client response - work around actually calling the GPU at all.
     return {

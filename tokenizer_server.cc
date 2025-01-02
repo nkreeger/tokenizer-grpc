@@ -6,14 +6,15 @@
 
 #include "tokenizer.grpc.pb.h"
 
+#include "cuda_utils.h"
 
 //------------------------------------------------------------------------------
 // TokenizerServiceImpl
 
 class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
   grpc::Status SendTokens(grpc::ServerContext* context,
-                    const ::tokenizer::TokenRequest* request,
-                    ::tokenizer::TokenRequestReply* response) {
+                          const ::tokenizer::TokenRequest* request,
+                          ::tokenizer::TokenRequestReply* response) {
     std::cerr << "Hi from SendTokens()" << std::endl;
 
     for (int i = 0; i < request->tokens_size(); i++) {
@@ -22,12 +23,19 @@ class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
 
     return grpc::Status::OK;
   }
+
+public:
+  void initCuda() {
+    // Stub to just make sure a CUDA device is setup.
+  }
 };
 
 int main(int argc, char** argv) {
   std::string server_address = "0.0.0.0:50051";
 
   TokenizerServiceImpl service;
+  service.initCuda();
+
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
   grpc::ServerBuilder builder;
