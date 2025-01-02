@@ -45,15 +45,20 @@ add_library(tokenizer_grpc_proto
     ${tokenizer_proto_srcs}
     ${tokenizer_proto_hdrs}
 )
-
 target_link_libraries(tokenizer_grpc_proto
     protobuf::libprotobuf
 )
 
+add_library(cuda_tests
+    "cuda_tests.cc"
+)
+set_source_files_properties(cuda_tests.h PROPERTIES LANGUAGE CUDA)
+set_source_files_properties(cuda_tests.cc PROPERTIES LANGUAGE CUDA)
+
 add_executable(tokenizer_server tokenizer_server.cc)
-set_source_files_properties(tokenizer_server.cc PROPERTIES LANGUAGE CUDA)
 target_link_libraries(tokenizer_server
     tokenizer_grpc_proto
+    cuda_tests
     gRPC::grpc++
     gRPC::grpc++_reflection
     protobuf::libprotobuf
