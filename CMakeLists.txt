@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(TokenizerServer C CXX CUDA)
+project(TokenizerServer C CXX)
 
 # Stock setup
 find_program(_PROTOBUF_PROTOC protoc)
@@ -13,8 +13,6 @@ message(STATUS "Using protobuf ${Protobuf_VERSION}")
 
 find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
-
-# find_package(CUDA REQUIRED)
 
 get_filename_component(tokenizer_proto "tokenizer.proto" ABSOLUTE)
 get_filename_component(tokenizer_proto_path "${tokenizer_proto}" PATH)
@@ -49,20 +47,11 @@ target_link_libraries(tokenizer_grpc_proto
     protobuf::libprotobuf
 )
 
-add_library(cuda_tests
-    "cuda_tests.cc"
-)
-set_source_files_properties(cuda_tests.h PROPERTIES LANGUAGE CUDA)
-set_source_files_properties(cuda_tests.cc PROPERTIES LANGUAGE CUDA)
-
 add_executable(tokenizer_server tokenizer_server.cc)
 target_link_libraries(tokenizer_server
     tokenizer_grpc_proto
-    cuda_tests
     gRPC::grpc++
     gRPC::grpc++_reflection
     protobuf::libprotobuf
 )
 
-add_executable(cuda_test cuda_test.cc)
-set_source_files_properties(cuda_test.cc PROPERTIES LANGUAGE CUDA)

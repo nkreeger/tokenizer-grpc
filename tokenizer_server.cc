@@ -4,9 +4,7 @@
 
 #include <iostream>
 
-#include "cuda_tests.h"
 #include "tokenizer.grpc.pb.h"
-
 
 //------------------------------------------------------------------------------
 // TokenizerServiceImpl
@@ -24,27 +22,14 @@ class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
     return grpc::Status::OK;
   }
 
-  CudaSession* session;
-
  public:
-  void initCuda() {
-    // Stub to just make sure a CUDA device is setup.
-    session = new CudaSession();
-    session->allocateStubMemory();
-  }
-
-  virtual ~TokenizerServiceImpl() {
-    if (session) {
-      delete session;
-    }
-  }
+  virtual ~TokenizerServiceImpl() {}
 };
 
 int main(int argc, char** argv) {
   std::string server_address = "0.0.0.0:50051";
 
   TokenizerServiceImpl service;
-  service.initCuda();
 
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
