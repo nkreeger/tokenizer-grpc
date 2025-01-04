@@ -8,11 +8,13 @@ service Tokenizer {
   rpc SendTokens (TokenRequest) returns (TokenRequestReply) {}
 }
 
-// The request message containing the user's name.
+//------------------------------------------------------------------------------
+// Request to send to the LLM - should contain tokenized messages.
+
 message TokenRequest {
-  string name = 1;
-  repeated string tokens = 2;
-  // Something about context here?
+  string uuid = 1;
+  string model_name = 2;
+  repeated string prompt_tokens = 3;
 }
 
 // The response message containing the greetings

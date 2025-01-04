@@ -2,8 +2,10 @@ from fastapi import FastAPI, Request
 from transformers import AutoTokenizer
 
 import grpc
+import pprint
 import tokenizer_pb2
 import tokenizer_pb2_grpc
+import uuid
 
 app = FastAPI()
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
@@ -23,14 +25,18 @@ async def post_chat_completions(request: Request):
         prompt = "ROLE: {}\nMESSAGE: {}".format(message["role"], message["content"])
         tokens = tokenizer.tokenize(prompt)
 
+        pprint.pprint(request_json)
+
         with grpc.insecure_channel("localhost:50051") as channel:
             stub = tokenizer_pb2_grpc.TokenizerStub(channel)
 
-            request = tokenizer_pb2.TokenRequest()
+            token_request = tokenizer_pb2.TokenRequest(
+                uuid=str(uuid.uuid4()),
+                model_name=request_json['model'])
             for token in tokens:
-                request.tokens.append(token)
+                token_request.prompt_tokens.append(token)
 
-            response = stub.SendTokens(request)
+            response = stub.SendTokens(token_request)
             print("Tokenizer client received: " + response.message)
 
     except Exception as e:
