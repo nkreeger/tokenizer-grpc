@@ -19,6 +19,8 @@ class TokenizerServiceImpl final : public tokenizer::Tokenizer::Service {
       std::cerr << request->tokens(i) << std::endl;
     }
 
+    std::cerr << "--------------------------------" << std::endl;
+
     return grpc::Status::OK;
   }
 
